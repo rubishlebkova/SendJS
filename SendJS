@@ -1,0 +1,406 @@
+function send(code, data)
+{
+    if (data["code"] == "ACTIVE" || data["code"] == "SOLD")
+    {
+        if (code == "edit_one")
+        {
+            $("input." + data["code"] + "[data-id=" + data["id"] + "]").hide();
+            $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                .parents("td")
+                .find(".preload")
+                .show();
+        }
+    } else if (
+        data["code"] == "SIZE_CL" ||
+        data["code"] == "SIZE_SH" ||
+        data["code"] == "SIZE_AX"
+    )
+    {
+        $(
+            "input." +
+            data["code"] +
+            "[data-id=" +
+            data["id"] +
+            "]" +
+            "[data-prop=" +
+            data["size"] +
+            "]"
+        )
+            .parent(".in_check")
+            .hide();
+
+        $(
+            "input." +
+            data["code"] +
+            "[data-id=" +
+            data["id"] +
+            "]" +
+            "[data-prop=" +
+            data["size"] +
+            "]"
+        )
+            .parents("div.wrapcheck")
+            .find(".preload")
+            .show();
+    } else if (code == "edit_one")
+    {
+    } else
+    {
+        $.fancybox.close();
+        $.blockUI({
+            message: "<p>Пожалуйста подождите...</p>",
+            css: { backgroundColor: "#f00", color: "#fff" },
+            overlayCSS: { backgroundColor: "#000", opacity: 0.1, cursor: "wait" }
+        });
+    }
+
+    $("table .change_status").removeClass("change_status");
+
+    $.ajax({
+        type: "POST",
+        url: ajaxPath + "/ajax.php",
+        data: { code: code, data: data },
+        // timeout:5000,
+        error: function (xhr, status, error)
+        {
+            if (data["code"] == "ACTIVE" || data["code"] == "SOLD")
+            {
+                if (data["value"][0] == "Y")
+                {
+                    $("input." + data["code"] + "[data-id=" + data["id"] + "]").prop(
+                        "checked",
+                        false
+                    );
+                } else
+                {
+                    $("input." + data["code"] + "[data-id=" + data["id"] + "]").prop(
+                        "checked",
+                        true
+                    );
+                }
+                $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                    .parents("td")
+                    .find(".not_save")
+                    .show();
+                $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                    .parents("td")
+                    .find(".preload")
+                    .hide();
+                $("input." + data["code"] + "[data-id=" + data["id"] + "]").show();
+            } else if (
+                data["code"] == "SIZE_CL" ||
+                data["code"] == "SIZE_SH" ||
+                data["code"] == "SIZE_AX"
+            )
+            {
+                if (data["value"][0] == "Y")
+                {
+                    $(
+                        "input." +
+                        data["code"] +
+                        "[data-id=" +
+                        data["id"] +
+                        "]" +
+                        "[data-prop=" +
+                        data["size"] +
+                        "]"
+                    ).prop("checked", false);
+                } else
+                {
+                    $(
+                        "input." +
+                        data["code"] +
+                        "[data-id=" +
+                        data["id"] +
+                        "]" +
+                        "[data-prop=" +
+                        data["size"] +
+                        "]"
+                    ).prop("checked", true);
+                }
+                $(
+                    "input." +
+                    data["code"] +
+                    "[data-id=" +
+                    data["id"] +
+                    "]" +
+                    "[data-prop=" +
+                    data["size"] +
+                    "]"
+                )
+                    .parent(".in_check")
+                    .show();
+                $(
+                    "input." +
+                    data["code"] +
+                    "[data-id=" +
+                    data["id"] +
+                    "]" +
+                    "[data-prop=" +
+                    data["size"] +
+                    "]"
+                )
+                    .parents("div.wrapcheck")
+                    .find(".preload")
+                    .hide();
+                $(
+                    "input." +
+                    data["code"] +
+                    "[data-id=" +
+                    data["id"] +
+                    "]" +
+                    "[data-prop=" +
+                    data["size"] +
+                    "]"
+                )
+                    .parents("div.wrapcheck")
+                    .find(".not_save")
+                    .fadeIn("fast", function ()
+                    {
+                        setTimeout(function ()
+                        {
+                            $(
+                                "input." +
+                                data["code"] +
+                                "[data-id=" +
+                                data["id"] +
+                                "]" +
+                                "[data-prop=" +
+                                data["size"] +
+                                "]"
+                            )
+                                .parent("div.wrapcheck")
+                                .find(".not_save")
+                                .fadeOut(200);
+                        }, 2000);
+                    });
+            } else
+            {
+                $(".alert-danger").fadeIn("fast", function ()
+                {
+                    setTimeout("$('.alert-danger').fadeOut('fast')", 2000);
+                });
+            }
+            $.unblockUI();
+        },
+        success: function (msg)
+        {
+            // console.log(msg);
+            // var success = JSON.parse(msg);
+
+            if (data["code"] == "ACTIVE")
+            {
+                if (msg == "empty_props")
+                {
+                    // console.log(data);
+                    if (data["value"][0] == "Y")
+                    {
+                        $("input." + data["code"] + "[data-id=" + data["id"] + "]").prop(
+                            "checked",
+                            false
+                        );
+                    }
+
+                    $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                        .parents("td")
+                        .find(".empty_prop")
+                        .show();
+                    $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                        .parents("td")
+                        .find(".preload")
+                        .hide();
+                    $("input." + data["code"] + "[data-id=" + data["id"] + "]").show();
+                } else
+                {
+                    if (code == "edit_one")
+                    {
+                        $("input." + data["code"] + "[data-id=" + data["id"] + "]").show();
+                        $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                            .parents("td")
+                            .find(".preload")
+                            .hide();
+                        $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                            .parents("td")
+                            .find(".not_save")
+                            .hide();
+                        $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                            .parents("td")
+                            .find(".empty_prop")
+                            .hide();
+                    }
+                }
+            } else if (data["code"] == "SOLD")
+            {
+                $("input." + data["code"] + "[data-id=" + data["id"] + "]").show();
+                $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                    .parents("td")
+                    .find(".preload")
+                    .hide();
+                $("input." + data["code"] + "[data-id=" + data["id"] + "]")
+                    .parents("td")
+                    .find(".not_save")
+                    .hide();
+            } else if (
+                data["code"] == "SIZE_CL" ||
+                data["code"] == "SIZE_SH" ||
+                data["code"] == "SIZE_AX"
+            )
+            {
+                $(
+                    "input." +
+                    data["code"] +
+                    "[data-id=" +
+                    data["id"] +
+                    "]" +
+                    "[data-prop=" +
+                    data["size"] +
+                    "]"
+                )
+                    .parent(".in_check")
+                    .show();
+                $(
+                    "input." +
+                    data["code"] +
+                    "[data-id=" +
+                    data["id"] +
+                    "]" +
+                    "[data-prop=" +
+                    data["size"] +
+                    "]"
+                )
+                    .parents("div.wrapcheck")
+                    .find(".preload")
+                    .hide();
+                $(
+                    "input." +
+                    data["code"] +
+                    "[data-id=" +
+                    data["id"] +
+                    "]" +
+                    "[data-prop=" +
+                    data["size"] +
+                    "]"
+                )
+                    .parents("div.wrapcheck")
+                    .find(".not_save")
+                    .hide();
+            } else if (code == "edit_t")
+            {
+                $.unblockUI();
+
+                $.each(data["form"], function (index_f, value_f)
+                {
+                    var IBLOCK_SECTION_ID = 0;
+                    if (value_f["value"] != 0 && value_f["name"] == "IBLOCK_SECTION_ID")
+                    {
+                        //Раздел
+                        var text = $("#f_edit")
+                            .find("[name=IBLOCK_SECTION_ID] option:selected")
+                            .text();
+                        if (IBLOCK_SECTION_ID == 0)
+                        {
+                            $("tr.tr_edit .IBLOCK_SECTION_ID").html(
+                                '<span class="change_status">' + text + "<br><hr></span>"
+                            );
+                        } else
+                        {
+                            IBLOCK_SECTION_ID = 1;
+                            $("tr.tr_edit .IBLOCK_SECTION_ID span").append(text + "<br><hr>");
+                        }
+                    } else if (value_f["value"] != "" && value_f["name"] == "NAME")
+                    {
+                        //Название
+                        $("tr.tr_edit .NAME a.name_a")
+                            .html(value_f["value"])
+                            .addClass("change_status");
+                    } else if (
+                        value_f["value"] != 0 &&
+                        value_f["name"] == "IB_PROVIDER"
+                    )
+                    {
+                        //Постав
+                        let text = $("#f_edit")
+                            .find("[name=IB_PROVIDER] option:selected")
+                            .text();
+                        $("tr.tr_edit .IB_PROVIDER").html(
+                            '<span class="change_status">' + text + "</span>"
+                        );
+                    } else if (
+                        value_f["value"] != "" &&
+                        value_f["name"] == "PRICE_BASE"
+                    )
+                    {
+                        //Цена закупки
+                        $("tr.tr_edit .PRICE_BASE").html(
+                            '<span class="change_status">' + value_f["value"] + " руб.</span>"
+                        );
+                    } else if (value_f["value"] != 0 && value_f["name"] == "EXTRA")
+                    {
+                        //Наценка
+                        $("tr.tr_edit .EXTRA").html(
+                            '<span class="change_status">' + value_f["value"] + "%</span>"
+                        );
+                    } else if (value_f["value"] != 0 && value_f["name"] == "CVET")
+                    {
+                        //Цвет
+                        let text = $("#f_edit")
+                            .find("[name=CVET] option:selected")
+                            .text();
+                        $("tr.tr_edit .CVET .color_value")
+                            .html(text + "<br>")
+                            .addClass("change_status");
+                    } else if (value_f["value"] != 0 && value_f["name"] == "SEZON")
+                    {
+                        //Цвет
+                        let text = $("#f_edit")
+                            .find("[name=SEZON] option:selected")
+                            .text();
+                        $("tr.tr_edit .SEZON .color_value")
+                            .html(text + "<br>")
+                            .addClass("change_status");
+                    } else if (value_f["value"] != 0 && value_f["name"] == "PROIZVODITEL")
+                    {
+                        //Цвет
+                        let text = $("#f_edit")
+                            .find("[name=PROIZVODITEL] option:selected")
+                            .text();
+                        $("tr.tr_edit .PROIZVODITEL .color_value")
+                            .html(text + "<br>")
+                            .addClass("change_status");
+                    } else if (
+                        value_f["value"] != "" &&
+                        value_f["name"] == "PREVIEW_TEXT"
+                    )
+                    {
+                        //Описание
+                    }
+                });
+
+                $("#f_edit option:selected").each(function ()
+                {
+                    $(this).removeAttr("selected");
+                });
+
+                $("#f_edit").trigger("reset");
+            } else
+            {
+                $(".alert-success").fadeIn("fast", function ()
+                {
+                    setTimeout("$('.alert-success').fadeOut('fast')", 1000);
+                    setTimeout("$.fancybox.close()", 1000);
+                    setTimeout("$('.editblock').hide()", 1000);
+                    // setTimeout("$('#editform').hide()", 2000);
+                });
+
+                $("#f_edit option:selected").each(function ()
+                {
+                    $(this).removeAttr("selected");
+                });
+
+                $("#f_edit").trigger("reset");
+            }
+            $.unblockUI();
+            forTable();
+        }
+    });
+}
